@@ -97,7 +97,7 @@ def to_cmdfile(path):
         The path to .cmd file
     """
     dir, base = os.path.split(path)
-    return os.path.join(dir, '.' + base + '.cmd')
+    return os.path.join(dir, f'.{base}.cmd')
 
 
 def cmdfiles_for_o(obj):
@@ -146,8 +146,8 @@ def cmdfiles_for_modorder(modorder):
             ko = line.rstrip()
             base, ext = os.path.splitext(ko)
             if ext != '.ko':
-                sys.exit('{}: module path must end with .ko'.format(ko))
-            mod = base + '.mod'
+                sys.exit(f'{ko}: module path must end with .ko')
+            mod = f'{base}.mod'
 	    # The first line of *.mod lists the objects that compose the module.
             with open(mod) as m:
                 for obj in m.readline().split():
@@ -180,7 +180,7 @@ def process_line(root_directory, command_prefix, file_path):
     # Use os.path.abspath() to normalize the path resolving '.' and '..' .
     abs_path = os.path.abspath(os.path.join(root_directory, file_path))
     if not os.path.exists(abs_path):
-        raise ValueError('File %s not found' % abs_path)
+        raise ValueError(f'File {abs_path} not found')
     return {
         'directory': root_directory,
         'file': abs_path,
@@ -214,12 +214,11 @@ def main():
         elif path.endswith('modules.order'):
             cmdfiles = cmdfiles_for_modorder(path)
         else:
-            sys.exit('{}: unknown file type'.format(path))
+            sys.exit(f'{path}: unknown file type')
 
         for cmdfile in cmdfiles:
             with open(cmdfile, 'rt') as f:
-                result = line_matcher.match(f.readline())
-                if result:
+                if result := line_matcher.match(f.readline()):
                     try:
                         entry = process_line(directory, result.group(1),
                                              result.group(2))
