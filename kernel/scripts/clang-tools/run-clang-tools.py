@@ -45,12 +45,9 @@ def init(l, a):
 
 
 def run_analysis(entry):
-    # Disable all checks, then re-enable the ones we want
-    checks = "-checks=-*,"
-    if args.type == "clang-tidy":
-        checks += "linuxkernel-*"
-    else:
-        checks += "clang-analyzer-*"
+    checks = "-checks=-*," + (
+        "linuxkernel-*" if args.type == "clang-tidy" else "clang-analyzer-*"
+    )
     p = subprocess.run(["clang-tidy", "-p", args.path, checks, entry["file"]],
                        stdout=subprocess.PIPE,
                        stderr=subprocess.STDOUT,
